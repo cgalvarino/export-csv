@@ -56,7 +56,8 @@
             var keys = series.options.keys,
                 pointArrayMap = keys || series.pointArrayMap || ['y'],
                 valueCount = pointArrayMap.length,
-                requireSorting = series.requireSorting,
+                // requireSorting = series.requireSorting,
+                requireSorting = true,
                 categoryMap = {},
                 j;
 
@@ -98,6 +99,39 @@
 
                 });
                 i = i + j;
+
+                // Look for direction data!
+                if (series.options.hasOwnProperty('directionData')){
+                    var seriesName = series.options.directionData[0].fullName;
+                    var uom = !_.isEmpty(series.options.directionData[0].uom) ? ' (' + series.options.directionData[0].uom + ')': '';
+                    names.push(seriesName + uom);
+                    each(series.options.directionData, function (point, pIdx) {
+                        var key = requireSorting ? point.x : pIdx,
+                            prop,
+                            val;
+
+                        j = 0;
+
+                        if (!rows[key]) {
+                            rows[key] = [];
+                        }
+                        rows[key].x = point.x;
+
+                        // Pies, funnels, geo maps etc. use point name in X row
+                        if (!series.xAxis || series.exportKey === 'name') {
+                            rows[key].name = point.name;
+                        }
+
+                        while (j < valueCount) {
+                            prop = pointArrayMap[j]; // y, z etc
+                            val = point[prop];
+                            rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                            j = j + 1;
+                        }
+
+                    });
+                }
+                i = i + j;
             }
         });
 
@@ -114,7 +148,7 @@
 
         // Add header row
         if (!xTitle) {
-            xTitle = xAxis.isDatetimeAxis ? 'DateTime' : 'Category';
+            xTitle = xAxis.isDatetimeAxis ? 'DateTime (Local)' : 'Category';
         }
         dataRows = [[xTitle].concat(names)];
 
@@ -129,7 +163,7 @@
                     }
                     category = Highcharts.dateFormat(dateFormat, row.x);
                 } else if (xAxis.categories) {
-                    category = pick(xAxis.names[row.x], xAxis.categories[row.x], row.x)
+                    category = pick(xAxis.names[row.x], xAxis.categories[row.x], row.x);
                 } else {
                     category = row.x;
                 }
