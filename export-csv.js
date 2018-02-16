@@ -36,6 +36,7 @@
     Highcharts.Chart.prototype.getDataRows = function () {
         var options = (this.options.exporting || {}).csv || {},
             xAxis = this.xAxis[0],
+            yAxis = this.yAxis[0],
             rows = {},
             rowArr = [],
             dataRows,
@@ -52,6 +53,7 @@
 
         // Loop the series and index values
         i = 0;
+        var isProfileSeries;
         each(this.series, function (series) {
             var keys = series.options.keys,
                 pointArrayMap = keys || series.pointArrayMap || ['y'],
@@ -60,6 +62,8 @@
                 requireSorting = true,
                 categoryMap = {},
                 j;
+
+            isProfileSeries = isProfileSeries || series.options.profileSeries;
 
             // Map the categories for value axes
             each(pointArrayMap, function (prop) {
@@ -74,7 +78,13 @@
                 }
 
                 each(series.points, function (point, pIdx) {
-                    var key = requireSorting ? point.x : pIdx,
+                    var p = point;
+                    if (isProfileSeries) {
+                      // Profiles have a common axis of Y instead of X.  So swap things back for the export.
+                      p = _.extend({}, point, {x: point.y, y: point.x});
+                    }
+
+                    var key = requireSorting ? p.x : pIdx,
                         prop,
                         val;
 
@@ -83,16 +93,16 @@
                     if (!rows[key]) {
                         rows[key] = [];
                     }
-                    rows[key].x = point.x;
+                    rows[key].x = p.x;
 
                     // Pies, funnels, geo maps etc. use point name in X row
                     if (!series.xAxis || series.exportKey === 'name') {
-                        rows[key].name = point.name;
+                        rows[key].name = p.name;
                     }
 
                     while (j < valueCount) {
                         prop = pointArrayMap[j]; // y, z etc
-                        val = point[prop];
+                        val = p[prop];
                         rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
                         j = j + 1;
                     }
@@ -130,8 +140,8 @@
                         }
 
                     });
-                    i = i + j;
                 }
+                i = i + j;
             }
         });
 
@@ -148,7 +158,12 @@
 
         // Add header row
         if (!xTitle) {
-            xTitle = xAxis.isDatetimeAxis ? 'DateTime (Local)' : 'Category';
+            if (isProfileSeries) {
+              xTitle = yAxis.userOptions.title.text.charAt(0).toUpperCase() + yAxis.userOptions.title.text.slice(1);
+            }
+            else {
+              xTitle = xAxis.isDatetimeAxis ? 'DateTime (Local)' : 'Category';
+            }
         }
         dataRows = [[xTitle].concat(names)];
 
