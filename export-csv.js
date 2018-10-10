@@ -44,6 +44,7 @@
             i,
             x,
             xTitle = xAxis.options.title && xAxis.options.title.text,
+            numEl
 
             // Options
             dateFormat = options.dateFormat || '%Y-%m-%d %H:%M:%S',
@@ -103,12 +104,12 @@
                     while (j < valueCount) {
                         prop = pointArrayMap[j]; // y, z etc
                         val = p[prop];
-                        rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                        numEl = rows[key].length;
+                        rows[key][numEl] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
                         j = j + 1;
                     }
 
                 });
-                i = i + j;
 
                 // Look for direction data!
                 if (series.options.hasOwnProperty('directionData')){
@@ -135,13 +136,13 @@
                         while (j < valueCount) {
                             prop = pointArrayMap[j]; // y, z etc
                             val = point[prop];
-                            rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                            numEl = rows[key].length;
+                            rows[key][numEl] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
                             j = j + 1;
                         }
 
                     });
                 }
-                i = i + j;
             }
         });
 
@@ -157,13 +158,10 @@
         });
 
         // Add header row
-        if (!xTitle) {
-            if (isProfileSeries) {
-              xTitle = yAxis.userOptions.title.text.charAt(0).toUpperCase() + yAxis.userOptions.title.text.slice(1);
-            }
-            else {
-              xTitle = xAxis.isDatetimeAxis ? 'DateTime (Local)' : 'Category';
-            }
+        if (!xTitle && !isProfileSeries) {
+            xTitle = xAxis.isDatetimeAxis ? 'DateTime (Local)' : 'Category';  
+        } else if (isProfileSeries) {
+            xTitle = yAxis.userOptions.title.text.charAt(0).toUpperCase() + yAxis.userOptions.title.text.slice(1); 
         }
         dataRows = [[xTitle].concat(names)];
 
