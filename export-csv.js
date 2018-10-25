@@ -44,7 +44,7 @@
             i,
             x,
             xTitle = xAxis.options.title && xAxis.options.title.text,
-            numEl
+            numEl,
 
             // Options
             dateFormat = options.dateFormat || '%Y-%m-%d %H:%M:%S',
