@@ -154,7 +154,7 @@
         }
         // Sort it by X values
         rowArr.sort(function (a, b) {
-            return a.x - b.x;
+            return  Math.abs(a.x) - Math.abs(b.x);
         });
 
         // Add header row
