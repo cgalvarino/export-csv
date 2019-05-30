@@ -108,6 +108,7 @@
                     }
 
                 });
+                i = i + j;
 
                 // Look for direction data!
                 if (series.options.hasOwnProperty('directionData')){
@@ -139,8 +140,9 @@
                         }
 
                     });
+
+                    i = i + j;
                 }
-                i = i + j;
             }
         });
 
