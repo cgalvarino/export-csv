@@ -119,7 +119,7 @@
                             prop,
                             val;
 
-                        j = 0;
+                        var j = 0;
 
                         if (!rows[key]) {
                             rows[key] = [];
