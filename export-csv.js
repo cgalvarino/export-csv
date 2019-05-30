@@ -44,7 +44,6 @@
             i,
             x,
             xTitle = xAxis.options.title && xAxis.options.title.text,
-            numEl,
 
             // Options
             dateFormat = options.dateFormat || '%Y-%m-%d %H:%M:%S',
@@ -104,8 +103,7 @@
                     while (j < valueCount) {
                         prop = pointArrayMap[j]; // y, z etc
                         val = p[prop];
-                        numEl = rows[key].length;
-                        rows[key][numEl] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                        rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
                         j = j + 1;
                     }
 
@@ -136,13 +134,13 @@
                         while (j < valueCount) {
                             prop = pointArrayMap[j]; // y, z etc
                             val = point[prop];
-                            numEl = rows[key].length;
-                            rows[key][numEl] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
+                            rows[key][i + j] = pick(categoryMap[prop][val], val); // Pick a Y axis category if present
                             j = j + 1;
                         }
 
                     });
                 }
+                i = i + j;
             }
         });
 
